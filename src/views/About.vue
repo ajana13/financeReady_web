@@ -101,7 +101,7 @@
                   />
 
                   <span>Add/Deduct: {{ selected }}</span>
-                  <v-select v-model="select" :items="['Add Funds', 'Deduct Funds']"></v-select>
+                  <v-select v-model="selectedEvent.color" :items="['Add Funds', 'Deduct Funds']"></v-select>
 
                   <span>Amount:</span>
                   <textarea-autosize
@@ -135,7 +135,8 @@ export default {
   // components: {
   //   HelloWorld,
   // },
-  bal: 0,
+  // bal: 0,
+  currBal: 0,
   data: () => ({
     focus: '',
     type: 'month',
@@ -176,21 +177,30 @@ export default {
         } else if (appData.color == 'green') {
           bal += appData.value
         }
-        console.log(bal)
-        console.log(appData.id)
         this.updateBal(bal, appData)
       })
       this.events = events
     },
     async updateEvent(ev) {
+      if (ev.color === 'Add Funds') {
+        ev.color = 'green'
+        ev.name = 'Funds added'
+      } else if (ev.color === 'Deduct Funds') {
+        ev.color = 'red'
+        ev.name = 'Funds deducted'
+      }
       await db
         .collection('calEvent')
         .doc(this.currentlyEditing)
         .update({
           details: ev.details,
+          value: Number(ev.value),
+          color: ev.color,
+          name: ev.name,
         })
       this.selectedOpen = false
       this.currentlyEditing = null
+      this.updateEvent()
     },
     async updateBal(bal, ev) {
       await db
