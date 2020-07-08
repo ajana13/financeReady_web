@@ -8,9 +8,9 @@
         <v-list-item>
           <v-list-item-content>
             <v-list-item-title>Your Finances</v-list-item-title>
-            <v-list-item-subtitle>{{ currBal }}</v-list-item-subtitle>
-            <v-list-item-subtitle>{{ nextUpdate }}</v-list-item-subtitle>
             <v-list-item-subtitle>{{ nextBal }}</v-list-item-subtitle>
+            <v-list-item-subtitle>{{ nextUpdate }}</v-list-item-subtitle>
+            <v-list-item-subtitle>{{ currBal }}</v-list-item-subtitle>
           </v-list-item-content>
         </v-list-item>
 
@@ -38,8 +38,8 @@ export default {
   methods: {
     todayDate() {
       var today = new Date()
-      var dd = String(today.getDate())
-      var mm = String(today.getMonth() + 1) //January is 0!
+      var dd = String(today.getDate()).padStart(2, '0')
+      var mm = String(today.getMonth() + 1).padStart(2, '0') //January is 0!
       // var mm = String(today.getMonth() + 1).padStart(2, '0') //January is 0!
       var yyyy = today.getFullYear()
       today = yyyy + '-' + mm + '-' + dd
@@ -59,11 +59,12 @@ export default {
           this.currBal = appData.bal
         } else {
           // Get next Update date
-          if (n == 1) {
+          if (n === 1) {
+            console.log(appData.start)
             return appData.start
           }
           // Get next Update Balance
-          if (n == 2) {
+          if (n === 2) {
             return appData.bal
           }
           // Get current balance

@@ -7,6 +7,7 @@
       <v-col>
         <v-sheet height="64">
           <v-toolbar flat color="white">
+            <v-icon @click="dialog = true">mdi-plus-box</v-icon>
             <v-btn outlined class="mr-4" color="grey darken-2" @click="setToday">Today</v-btn>
             <v-btn fab text small color="grey darken-2" @click="prev">
               <v-icon small>mdi-chevron-left</v-icon>
@@ -40,6 +41,31 @@
             </v-menu>
           </v-toolbar>
         </v-sheet>
+
+        <!-- Add Event dialog -->
+        <v-dialog v-model="dialog" max-width="500">
+          <v-card>
+            <v-container>
+              <v-form @submit.prevent="addEvent">
+                <v-text-field v-model="details" type="text" label="details" />
+                <v-text-field v-model="start" type="date" label="date (required)" />
+                <v-text-field v-model="value" type="number" label="amount (required)" />
+                <v-select
+                  v-model="color"
+                  :items="['Add Funds', 'Deduct Funds']"
+                  label="add/deduct (required)"
+                />
+                <v-btn
+                  type="submit"
+                  color="primary"
+                  class="mr-4"
+                  @click.stop="dialog=false"
+                >Create Event</v-btn>
+              </v-form>
+            </v-container>
+          </v-card>
+        </v-dialog>
+
         <v-sheet height="600">
           <v-calendar
             ref="calendar"
@@ -74,7 +100,7 @@
                   <v-icon>mdi-heart</v-icon>
                 </v-btn>-->
                 <v-btn icon>
-                  <v-icon>mdi-dots-vertical</v-icon>
+                  <v-icon @click="deleteEvent(selectedEvent.id)">mdi-delete</v-icon>
                 </v-btn>
               </v-toolbar>
               <v-card-text>
@@ -151,10 +177,9 @@ export default {
     events: [],
     name: null,
     details: null,
-    color: '#1976D2',
+    color: '',
     value: 0,
     start: null,
-    end: null,
     currentlyEditing: null,
     dialog: false,
   }),
@@ -186,6 +211,31 @@ export default {
         .update({
           date: Number(ev.date),
         })
+    },
+
+    async addEvent() {
+      if (this.start && this.value && this.color) {
+        if (this.color === 'Add Funds') {
+          this.color = 'green'
+          this.name = 'Funds added'
+        } else if (this.color === 'Deduct Funds') {
+          this.color = 'red'
+          this.name = 'Funds deducted'
+        }
+        await db.collection('calEvent').add({
+          details: this.details,
+          value: Number(this.value),
+          start: this.start,
+          date: Date.parse(this.start),
+          bal: 0,
+          color: this.color,
+          name: this.name,
+        })
+      } else {
+        alert('Date, value, and type are required')
+      }
+      this.getEvents()
+      this.getEvents()
     },
 
     async updateAllBal() {
@@ -227,6 +277,15 @@ export default {
       this.selectedOpen = false
       this.currentlyEditing = null
       this.updateAllBal()
+    },
+
+    async deleteEvent(ev) {
+      await db
+        .collection('calEvent')
+        .doc(ev)
+        .delete()
+      this.selectedOpen = false
+      this.getEvents()
     },
 
     async updateBal(bal, ev) {
