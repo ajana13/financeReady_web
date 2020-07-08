@@ -7,10 +7,25 @@
       <v-list dense nav>
         <v-list-item>
           <v-list-item-content>
-            <v-list-item-title>Your Finances</v-list-item-title>
-            <v-list-item-subtitle>{{ nextBal }}</v-list-item-subtitle>
-            <v-list-item-subtitle>{{ nextUpdate }}</v-list-item-subtitle>
-            <v-list-item-subtitle>{{ currBal }}</v-list-item-subtitle>
+            <!-- <v-list-item-title>Your Finances</v-list-item-title> -->
+            <v-card>
+              <v-card-title>Your Finances</v-card-title>
+              <br />
+              <p class="summary">
+                <v-card-text>
+                  <h3>Current Balance:</h3>
+                  {{ currBal }}
+                </v-card-text>
+                <v-card-text>
+                  <h3>Next Update:</h3>
+                  {{ nextUpdate }}
+                </v-card-text>
+                <v-card-text>
+                  <h3>Balance on next update:</h3>
+                  {{ nextBal }}
+                </v-card-text>
+              </p>
+            </v-card>
           </v-list-item-content>
         </v-list-item>
 
@@ -43,6 +58,7 @@ export default {
       // var mm = String(today.getMonth() + 1).padStart(2, '0') //January is 0!
       var yyyy = today.getFullYear()
       today = yyyy + '-' + mm + '-' + dd
+      this.today = today
       return today
     },
     async getBal(n) {
@@ -50,31 +66,27 @@ export default {
         .collection('calEvent')
         .orderBy('date', 'asc')
         .get()
-      // let today = this.todayDate()
-      // this.today = today
-      snapshot.forEach(doc => {
-        let appData = doc.data()
+      for (var i = 0; i < snapshot.size; i++) {
+        let appData = snapshot.docs[i].data()
         // if aftertoday, do not include in current bal
         if (appData.start <= this.today) {
           this.currBal = appData.bal
         } else {
           // Get next Update date
-          if (n === 1) {
-            console.log(appData.start)
-            return appData.start
+          if (n == 1) {
+            this.nextUpdate = appData.start
           }
           // Get next Update Balance
-          if (n === 2) {
-            return appData.bal
+          if (n == 2) {
+            this.nextBal = appData.bal
           }
-          // Get current balance
-          return this.currBal
+          return
         }
-      })
+      }
       if (n == 1) {
-        return 'No new updates'
+        this.nextUpdate = 'No new updates'
       } else {
-        return this.currBal
+        this.nextBal = this.currBal
       }
     },
   },
