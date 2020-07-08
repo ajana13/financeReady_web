@@ -134,8 +134,8 @@ import { db } from '@/main'
 
 export default {
   name: 'Calendar',
-  currBal: 0,
-  today: '',
+  // currBal: 0,
+  // today: '',
   data: () => ({
     focus: '',
     type: 'month',
@@ -159,35 +159,41 @@ export default {
     dialog: false,
   }),
   mounted() {
-    // this.$refs.calendar.checkChange()
     this.getEvents()
   },
   methods: {
-    todayDate() {
-      var today = new Date()
-      var dd = String(today.getDate())
-      var mm = String(today.getMonth() + 1) //January is 0!
-      // var mm = String(today.getMonth() + 1).padStart(2, '0') //January is 0!
-      var yyyy = today.getFullYear()
-      today = yyyy + '-' + mm + '-' + dd
-      this.today = today
-      return today
-    },
     async getEvents() {
-      let snapshot = await db.collection('calEvent').get()
+      let snapshot = await db
+        .collection('calEvent')
+        .orderBy('date', 'asc')
+        .get()
       let events = []
       snapshot.forEach(doc => {
         let appData = doc.data()
         appData.id = doc.id
+        appData.date = Date.parse(appData.start)
+        this.updateDate(appData)
         events.push(appData)
       })
       this.updateAllBal()
       this.events = events
     },
 
+    async updateDate(ev) {
+      await db
+        .collection('calEvent')
+        .doc(ev.id)
+        .update({
+          date: Number(ev.date),
+        })
+    },
+
     async updateAllBal() {
-      let today = this.todayDate()
-      let snapshot = await db.collection('calEvent').get()
+      // let today = this.todayDate()
+      let snapshot = await db
+        .collection('calEvent')
+        .orderBy('date', 'asc')
+        .get()
       let bal = 0
       snapshot.forEach(doc => {
         let appData = doc.data()
@@ -196,11 +202,6 @@ export default {
           bal -= appData.value
         } else if (appData.color == 'green') {
           bal += appData.value
-        }
-        // if aftertoday, do not include in current bal
-        if (appData.start <= today) {
-          this.currBal = bal
-          console.log(this.currBal)
         }
         this.updateBal(bal, appData)
       })
@@ -225,7 +226,7 @@ export default {
         })
       this.selectedOpen = false
       this.currentlyEditing = null
-      await this.updateAllBal()
+      this.updateAllBal()
     },
 
     async updateBal(bal, ev) {

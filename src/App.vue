@@ -17,13 +17,7 @@
     </v-navigation-drawer>
 
     <!-- Navivgation bar (header) -->
-    <v-app-bar
-      absolute
-      color="lightgrey"
-      elevate-on-scroll
-      scroll-target="#scrolling-techniques-7"
-      app
-    >
+    <v-app-bar absolute color="lightgrey" elevate-on-scroll app>
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
       <v-toolbar-title>Title</v-toolbar-title>
 
