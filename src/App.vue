@@ -47,7 +47,8 @@
     </v-main>
 
     <v-footer app>
-      <!-- -->
+      <v-spacer></v-spacer>
+      <div>&copy; {{ new Date().getFullYear() }}</div>
     </v-footer>
   </v-app>
 </template>
@@ -60,6 +61,7 @@ export default {
     drawer: false,
     items: [
       { title: 'Home', icon: 'mdi-home', route: '/' },
+      { title: 'Calendar', icon: 'mdi-calendar', route: '/calendar' },
       { title: 'About', icon: 'mdi-at', route: '/about' },
     ],
   }),

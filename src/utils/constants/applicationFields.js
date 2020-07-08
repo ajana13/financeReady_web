@@ -45,36 +45,4 @@ export const APPLICATION_FIELDS = [
     md: '4',
     items: ['Male', 'Female', 'Other']
   },
-  {
-    name: 'diet_restrictions',
-    label: 'Dietary Resctrictions',
-    type: 'combobox',
-    rules: Rules.required('Dietary Resctrictions'),
-    md: '4',
-    items: ['None', 'Vegetarian', 'Vegan', 'Gluten Free', 'Halal']
-  },
-  {
-    name: 'major',
-    label: 'Major',
-    type: 'combobox',
-    rules: Rules.required('Major'),
-    md: '4',
-    items: [
-      'Material Science',
-      'Biomedical',
-      'Electrical',
-      'Computer Science and Engineering',
-      'Computer Science',
-      'Mechanical',
-      'Aerospace'
-    ]
-  },
-  {
-    name: 'class',
-    label: 'Class',
-    type: 'select',
-    rules: Rules.required('Class'),
-    md: '4',
-    items: ['Freshman', 'Sophomore', 'Junior', 'Senior', 'Super Senior']
-  }
 ]
