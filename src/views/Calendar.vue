@@ -175,7 +175,7 @@ export default {
         this.updateDate(appData)
         events.push(appData)
       })
-      // this.updateAllBal()
+      this.updateAllBal()
       this.events = events
     },
 
