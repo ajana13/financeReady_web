@@ -1,5 +1,7 @@
 # finance_ready
 
+Manage all your finances at once and know how much money you have readily available. 
+
 ## Project setup
 ```
 npm install
