@@ -32,6 +32,22 @@
         <v-divider></v-divider>
       </v-list>
     </v-navigation-drawer>
+
+    <div class="ml-32">
+      <v-card class="d-block" min-width="70%">
+        <v-container>
+          <v-row justify="space-between">
+            <v-col>
+              <line-chart :data="balChartData"></line-chart>
+            </v-col>
+
+            <v-col cols="auto" class="text-center pl-0">
+              <v-row class="flex-column ma-0 fill-height" justify="center"></v-row>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-card>
+    </div>
   </div>
 </template>
 
@@ -42,12 +58,22 @@ import { db } from '@/main'
 
 export default {
   name: 'Home',
+  events: [],
+  dates: [],
+  bal: [],
   data() {
     return {
       today: this.todayDate(),
       currBal: this.getBal(3),
       nextBal: this.getBal(2),
       nextUpdate: this.getBal(1),
+      // balChartData: {
+      //   '2020-06-07': 2,
+      //   '2020-07-04': 5,
+      //   '2020-07-07': 7,
+      //   '2020-07-10': 3,
+      // },
+      balChartData: this.getEvents(),
     }
   },
   methods: {
@@ -89,6 +115,39 @@ export default {
         this.nextBal = this.currBal
       }
     },
+    async getEvents() {
+      let snapshot = await db
+        .collection('calEvent')
+        .orderBy('date', 'asc')
+        .get()
+      let events = []
+      let bal = []
+      let dates = []
+      let balChartData = {}
+      snapshot.forEach(doc => {
+        let appData = doc.data()
+        appData.id = doc.id
+        appData.date = Date.parse(appData.start)
+        events.push(appData)
+        bal.push(appData.bal)
+        dates.push(appData.start)
+        balChartData.appData.start = appData.bal
+        console.log(balChartData.appData.start)
+      })
+      this.events = events
+      this.bal = bal
+      this.dates = dates
+      this.balChartData = balChartData
+    },
   },
 }
 </script>
+
+<style>
+.ml-32 {
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 5%;
+  padding-top: 2%;
+}
+</style>

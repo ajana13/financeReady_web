@@ -10,9 +10,11 @@
   },
   "dependencies": {
     "axios": "^0.19.2",
+    "chart.js": "^2.9.3",
     "core-js": "^3.6.5",
     "firebase": "^7.15.5",
     "vue": "^2.6.11",
+    "vue-chartkick": "^0.6.0",
     "vue-router": "^3.2.0",
     "vue-textarea-autosize": "^1.1.1",
     "vuetify": "^2.2.11",

@@ -5,8 +5,11 @@ import store from './store'
 import vuetify from './plugins/vuetify'
 import VueTextareaAutosize from 'vue-textarea-autosize'
 import firebase from 'firebase'
+import chartkick from 'vue-chartkick'
+import chart from 'chart.js'
 
 Vue.use(VueTextareaAutosize)
+Vue.use(chartkick.use(chart))
 
 Vue.config.productionTip = false
 
