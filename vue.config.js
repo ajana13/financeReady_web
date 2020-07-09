@@ -1,3 +1,6 @@
 module.exports = {
-  transpileDependencies: ["vuetify"]
-};
+  transpileDependencies: ['vuetify'],
+}
+module.exports = {
+  publicPath: '/financeReady_web/',
+}

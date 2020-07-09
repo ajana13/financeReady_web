@@ -19,7 +19,7 @@
     <!-- Navivgation bar (header) -->
     <v-app-bar absolute color="lightgrey" elevate-on-scroll app>
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
-      <v-toolbar-title>Title</v-toolbar-title>
+      <v-toolbar-title>FinanceReady</v-toolbar-title>
 
       <v-spacer></v-spacer>
 
