@@ -34,10 +34,10 @@
       <v-card class="d-block" min-width="70%">
         <v-container>
           <v-row>
-            <v-col class="d-flex" cols="12" sm="2">
+            <v-col class="d-flex" cols="12" sm="3">
               <v-select
                 v-model="timePeriod"
-                :items="['year-to-date', 'year', 'month', 'last 5 years', 'all time']"
+                :items="['year-to-date', 'year', 'month', 'all-time']"
                 filled
                 @change="timePeriod = timePeriod"
                 placeholder="year-to-date"
@@ -71,8 +71,10 @@
                 :data="balChartData"
                 :min="balChartMin"
                 :max="balChartMax"
-                xtitle="Date"
+                prefix="$"
+                :xtitle="timePeriod + ' ' + month + ' ' + year"
                 ytitle="Balance"
+                :messages="{empty: 'No data for the selected time-period'}"
               ></line-chart>
             </v-col>
 
@@ -111,7 +113,7 @@ export default {
       balChartData: null,
       balChartMax: 0,
       balChartMin: 0,
-      timePeriod: '',
+      timePeriod: 'year-to-date',
       month: '',
       year: '',
     }
@@ -122,30 +124,25 @@ export default {
       let bal = []
       var i = 0
       if (this.timePeriod === 'year-to-date') {
-        let startYear = this.today.substr(0, 3) + '-01-01'
-        for (i = this.dates.length - 1; i >= 0; i--) {
-          if (this.dates[i] >= startYear) {
-            dates.push(this.dates[i])
-            bal.push(this.bal[i])
+        this.month = ''
+        let startYear = this.today.substr(0, 4) + '-01-01'
+        for (i = this.events.length - 1; i >= 0; i--) {
+          if (this.events[i].start >= startYear) {
+            dates.push(this.events[i].start)
+            bal.push(this.events[i].bal)
           } else {
             break
           }
         }
-        dates = dates.reverse()
-        bal = bal.reverse()
-        this.dates = dates
-        this.bal = bal
-        this.getBalData()
-      }
-      if (this.timePeriod === 'year') {
+      } else if (this.timePeriod === 'year') {
+        this.month = ''
         let yyyy = '2020'
+        // make this auto instead of fixing years
         if (this.year === '2021') {
           yyyy = '2021'
-        }
-        if (this.year === '2019') {
+        } else if (this.year === '2019') {
           yyyy = '2019'
-        }
-        if (this.year === '2018') {
+        } else if (this.year === '2018') {
           yyyy = '2018'
         }
         if (this.year === '2017') {
@@ -159,18 +156,93 @@ export default {
         }
         let startYear = yyyy + '-01-01'
         let endYear = Number(yyyy) + 1 + '-01-01'
-        for (i = 0; i < this.dates.length; i++) {
-          if (this.dates[i] >= startYear && this.dates[i] < endYear) {
-            dates.push(this.dates[i])
-            bal.push(this.bal[i])
+        for (i = 0; i < this.events.length; i++) {
+          if (
+            this.events[i].start >= startYear &&
+            this.events[i].start < endYear
+          ) {
+            dates.push(this.events[i].start)
+            bal.push(this.events[i].bal)
+          } else if (this.events[i].start > startYear) {
+            continue
           } else {
             break
           }
         }
-        this.dates = dates
-        this.bal = bal
-        this.getBalData()
+      } else if (this.timePeriod === 'month') {
+        this.year = this.today.substr(0, 4)
+        let mm = '01'
+        let em = '02'
+        if (this.month === 'Feb') {
+          mm = '02'
+          em = '03'
+        } else if (this.month == 'Mar') {
+          mm = '03'
+          em = '04'
+        } else if (this.month == 'April') {
+          mm = '04'
+          em = '05'
+        } else if (this.month == 'May') {
+          mm = '05'
+          em = '06'
+        } else if (this.month == 'Jun') {
+          mm = '06'
+          em = '07'
+        } else if (this.month == 'Jul') {
+          mm = '07'
+          em = '08'
+        } else if (this.month == 'Aug') {
+          mm = '08'
+          em = '09'
+        } else if (this.month == 'Sep') {
+          mm = '09'
+          em = '10'
+        } else if (this.month == 'Oct') {
+          mm = '11'
+          em = '02'
+        } else if (this.month == 'Nov') {
+          mm = '11'
+          em = '12'
+        } else if (this.month == 'Dec') {
+          mm = '12'
+          em = '01'
+        }
+        let yyyy = this.year
+        if (em == '01') {
+          yyyy = Number(this.year) + 1
+        }
+        let startMonth = yyyy + '-' + mm + '-01'
+        let endMonth = yyyy + '-' + em + '-01'
+        for (i = 0; i < this.events.length; i++) {
+          if (
+            this.events[i].start >= startMonth &&
+            this.events[i].start < endMonth
+          ) {
+            dates.push(this.events[i].start)
+            bal.push(this.events[i].bal)
+          } else if (this.events[i].start > startMonth) {
+            continue
+          } else {
+            break
+          }
+        }
+      } else {
+        for (i = 0; i < this.events.length; i++) {
+          dates.push(this.events[i].start)
+          bal.push(this.events[i].bal)
+        }
       }
+      this.dates = dates
+      this.bal = bal
+      this.findMinMax(bal)
+      this.getBalData()
+    },
+
+    findMinMax(bal) {
+      let max = Math.max(...bal)
+      let min = Math.min(...bal)
+      this.balChartMax = max + (5 / 100) * max
+      this.balChartMin = min - (5 / 100) * min
     },
 
     todayDate() {
@@ -222,10 +294,7 @@ export default {
       this.events = events
       this.bal = bal
       this.dates = dates
-      let max = Math.max(...bal)
-      let min = Math.min(...bal)
-      this.balChartMax = max + (5 / 100) * max
-      this.balChartMin = min - (5 / 100) * min
+      this.findMinMax(bal)
       this.getBalData()
     },
 
@@ -233,11 +302,7 @@ export default {
       // await this.getEvents()
 
       let result = {}
-      // if (this.dates != []) {
-      //   this.balChartData = { Nothing: 2 }
-      // } else {
       this.dates.forEach((key, i) => (result[key] = this.bal[i]))
-      // }
       this.balChartData = result
     },
   },
