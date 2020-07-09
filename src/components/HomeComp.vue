@@ -33,6 +33,38 @@
     <div class="plot">
       <v-card class="d-block" min-width="70%">
         <v-container>
+          <v-row>
+            <v-col class="d-flex" cols="12" sm="2">
+              <v-select
+                v-model="timePeriod"
+                :items="['year-to-date', 'year', 'month', 'last 5 years', 'all time']"
+                filled
+                @change="timePeriod = timePeriod"
+                placeholder="year-to-date"
+              ></v-select>
+            </v-col>
+            <v-col class="d-flex" cols="12" sm="2" v-if="timePeriod == 'month'">
+              <v-select
+                v-model="month"
+                :items="['Jan', 'Feb', 'Mar', 'April', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']"
+                filled
+                placeholder="new"
+              ></v-select>
+            </v-col>
+            <v-col class="d-flex" cols="12" sm="2" v-if="timePeriod == 'year'">
+              <v-select
+                v-model="year"
+                :items="['2021', '2020', '2019', '2018', '2017', '2016', '2015']"
+                filled
+                placeholder="new"
+              ></v-select>
+            </v-col>
+            <v-col></v-col>
+            <v-col class="d-flex rightBtn" cols="12" sm="2">
+              <v-btn @click="updateChartTime()">Update</v-btn>
+            </v-col>
+          </v-row>
+
           <v-row justify="space-between">
             <v-col>
               <line-chart
@@ -64,18 +96,83 @@ export default {
   events: [],
   dates: [],
   bal: [],
+  async mounted() {
+    this.todayDate()
+    await this.getEvents()
+    this.getBal()
+    // this.getBalData()
+  },
   data() {
     return {
-      today: this.todayDate(),
-      currBal: this.getBal(3),
-      nextBal: this.getBal(2),
-      nextUpdate: this.getBal(1),
-      balChartData: this.getBalData(),
+      today: '',
+      currBal: 0,
+      nextBal: 0,
+      nextUpdate: '',
+      balChartData: null,
       balChartMax: 0,
       balChartMin: 0,
+      timePeriod: '',
+      month: '',
+      year: '',
     }
   },
   methods: {
+    updateChartTime() {
+      let dates = []
+      let bal = []
+      var i = 0
+      if (this.timePeriod === 'year-to-date') {
+        let startYear = this.today.substr(0, 3) + '-01-01'
+        for (i = this.dates.length - 1; i >= 0; i--) {
+          if (this.dates[i] >= startYear) {
+            dates.push(this.dates[i])
+            bal.push(this.bal[i])
+          } else {
+            break
+          }
+        }
+        dates = dates.reverse()
+        bal = bal.reverse()
+        this.dates = dates
+        this.bal = bal
+        this.getBalData()
+      }
+      if (this.timePeriod === 'year') {
+        let yyyy = '2020'
+        if (this.year === '2021') {
+          yyyy = '2021'
+        }
+        if (this.year === '2019') {
+          yyyy = '2019'
+        }
+        if (this.year === '2018') {
+          yyyy = '2018'
+        }
+        if (this.year === '2017') {
+          yyyy = '2017'
+        }
+        if (this.year === '2016') {
+          yyyy = '2016'
+        }
+        if (this.year === '2015') {
+          yyyy = '2015'
+        }
+        let startYear = yyyy + '-01-01'
+        let endYear = Number(yyyy) + 1 + '-01-01'
+        for (i = 0; i < this.dates.length; i++) {
+          if (this.dates[i] >= startYear && this.dates[i] < endYear) {
+            dates.push(this.dates[i])
+            bal.push(this.bal[i])
+          } else {
+            break
+          }
+        }
+        this.dates = dates
+        this.bal = bal
+        this.getBalData()
+      }
+    },
+
     todayDate() {
       var today = new Date()
       var dd = String(today.getDate()).padStart(2, '0')
@@ -85,7 +182,8 @@ export default {
       this.today = today
       return today
     },
-    async getBal(n) {
+
+    async getBal() {
       let snapshot = await db
         .collection('calEvent')
         .orderBy('date', 'asc')
@@ -96,23 +194,15 @@ export default {
         if (appData.start <= this.today) {
           this.currBal = appData.bal
         } else {
-          // Get next Update date
-          if (n == 1) {
-            this.nextUpdate = appData.start
-          }
-          // Get next Update Balance
-          if (n == 2) {
-            this.nextBal = appData.bal
-          }
+          this.nextUpdate = appData.start
+          this.nextBal = appData.bal
           return
         }
       }
-      if (n == 1) {
-        this.nextUpdate = 'No new updates'
-      } else {
-        this.nextBal = this.currBal
-      }
+      this.nextUpdate = 'No new updates'
+      this.nextBal = this.currBal
     },
+
     async getEvents() {
       let snapshot = await db
         .collection('calEvent')
@@ -121,7 +211,6 @@ export default {
       let events = []
       let bal = []
       let dates = []
-      let balChartData = {}
       snapshot.forEach(doc => {
         let appData = doc.data()
         appData.id = doc.id
@@ -133,18 +222,22 @@ export default {
       this.events = events
       this.bal = bal
       this.dates = dates
-      this.balChartData = balChartData
       let max = Math.max(...bal)
       let min = Math.min(...bal)
       this.balChartMax = max + (5 / 100) * max
-      console.log(min)
       this.balChartMin = min - (5 / 100) * min
+      this.getBalData()
     },
-    async getBalData() {
-      await this.getEvents()
+
+    getBalData() {
+      // await this.getEvents()
 
       let result = {}
+      // if (this.dates != []) {
+      //   this.balChartData = { Nothing: 2 }
+      // } else {
       this.dates.forEach((key, i) => (result[key] = this.bal[i]))
+      // }
       this.balChartData = result
     },
   },
@@ -157,5 +250,10 @@ export default {
   justify-content: flex-end;
   padding-right: 5%;
   padding-top: 2%;
+}
+.rightBtn {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
 }
 </style>
