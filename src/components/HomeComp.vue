@@ -35,7 +35,13 @@
         <v-container>
           <v-row justify="space-between">
             <v-col>
-              <line-chart :data="balChartData"></line-chart>
+              <line-chart
+                :data="balChartData"
+                :min="balChartMin"
+                :max="balChartMax"
+                xtitle="Date"
+                ytitle="Balance"
+              ></line-chart>
             </v-col>
 
             <v-col cols="auto" class="text-center pl-0">
@@ -65,6 +71,8 @@ export default {
       nextBal: this.getBal(2),
       nextUpdate: this.getBal(1),
       balChartData: this.getBalData(),
+      balChartMax: 0,
+      balChartMin: 0,
     }
   },
   methods: {
@@ -72,7 +80,6 @@ export default {
       var today = new Date()
       var dd = String(today.getDate()).padStart(2, '0')
       var mm = String(today.getMonth() + 1).padStart(2, '0') //January is 0!
-      // var mm = String(today.getMonth() + 1).padStart(2, '0') //January is 0!
       var yyyy = today.getFullYear()
       today = yyyy + '-' + mm + '-' + dd
       this.today = today
@@ -122,13 +129,16 @@ export default {
         events.push(appData)
         bal.push(appData.bal)
         dates.push(appData.start)
-        // balChartData.appData.start = appData.bal
-        // console.log(balChartData.appData.start)
       })
       this.events = events
       this.bal = bal
       this.dates = dates
       this.balChartData = balChartData
+      let max = Math.max(...bal)
+      let min = Math.min(...bal)
+      this.balChartMax = max + (5 / 100) * max
+      console.log(min)
+      this.balChartMin = min - (5 / 100) * min
     },
     async getBalData() {
       await this.getEvents()
