@@ -1,7 +1,11 @@
 <template>
   <div class="About">
     <h1>This is the about page</h1>
-    <line-chart :data="chartData" class="ml-auto"></line-chart>
+    <div class="plot">
+      <v-card class="d-block" min-width="100%">
+        <line-chart :data="chartData"></line-chart>
+      </v-card>
+    </div>
   </div>
 </template>
 
@@ -21,4 +25,11 @@ export default {
 }
 </script>
 
-<style></style>
+<style>
+.plot {
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 5%;
+  padding-top: 2%;
+}
+</style>

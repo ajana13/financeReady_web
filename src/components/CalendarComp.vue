@@ -137,7 +137,7 @@
               </form>
             </v-card-text>
             <v-card-actions>
-              <v-btn text color="secondary" @click="selectedOpen = false">Close</v-btn>
+              <v-btn text color="secondary" @click="closeOpen()">Close</v-btn>
             </v-card-actions>
           </v-card>
         </v-menu>
@@ -179,6 +179,10 @@ export default {
     this.getEvents()
   },
   methods: {
+    closeOpen() {
+      this.selectedOpen = false
+      this.currentlyEditing = null
+    },
     async getEvents() {
       let snapshot = await db
         .collection('calEvent')
@@ -192,7 +196,7 @@ export default {
         this.updateDate(appData)
         events.push(appData)
       })
-      this.updateAllBal()
+      await this.updateAllBal()
       this.events = events
     },
 
@@ -203,6 +207,7 @@ export default {
         .update({
           date: Number(ev.date),
         })
+      this.getEvents()
     },
 
     async addEvent() {
@@ -226,7 +231,6 @@ export default {
       } else {
         alert('Date, value, and type are required')
       }
-      this.getEvents()
       this.getEvents()
     },
 
@@ -316,6 +320,7 @@ export default {
 
       if (this.selectedOpen) {
         this.selectedOpen = false
+        this.currentlyEditing = null
         setTimeout(open, 10)
       } else {
         open()
