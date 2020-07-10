@@ -185,7 +185,7 @@ export default {
     },
     async getEvents() {
       let snapshot = await db
-        .collection('calEvent')
+        .collection('financeEvent')
         .orderBy('date', 'asc')
         .get()
       let events = []
@@ -202,7 +202,7 @@ export default {
 
     async updateDate(ev) {
       await db
-        .collection('calEvent')
+        .collection('financeEvent')
         .doc(ev.id)
         .update({
           date: Number(ev.date),
@@ -219,7 +219,7 @@ export default {
           this.color = 'red'
           this.name = 'Funds deducted'
         }
-        await db.collection('calEvent').add({
+        await db.collection('financeEvent').add({
           details: this.details,
           value: Number(this.value),
           start: this.start,
@@ -237,7 +237,7 @@ export default {
     async updateAllBal() {
       // let today = this.todayDate()
       let snapshot = await db
-        .collection('calEvent')
+        .collection('financeEvent')
         .orderBy('date', 'asc')
         .get()
       let bal = 0
@@ -262,7 +262,7 @@ export default {
         ev.name = 'Funds deducted'
       }
       await db
-        .collection('calEvent')
+        .collection('financeEvent')
         .doc(this.currentlyEditing)
         .update({
           details: ev.details,
@@ -277,7 +277,7 @@ export default {
 
     async deleteEvent(ev) {
       await db
-        .collection('calEvent')
+        .collection('financeEvent')
         .doc(ev)
         .delete()
       this.selectedOpen = false
@@ -286,7 +286,7 @@ export default {
 
     async updateBal(bal, ev) {
       await db
-        .collection('calEvent')
+        .collection('financeEvent')
         .doc(ev.id)
         .update({
           bal: bal,

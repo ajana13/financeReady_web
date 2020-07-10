@@ -257,7 +257,7 @@ export default {
 
     async getBal() {
       let snapshot = await db
-        .collection('calEvent')
+        .collection('financeEvent')
         .orderBy('date', 'asc')
         .get()
       for (var i = 0; i < snapshot.size; i++) {
@@ -277,7 +277,7 @@ export default {
 
     async getEvents() {
       let snapshot = await db
-        .collection('calEvent')
+        .collection('financeEvent')
         .orderBy('date', 'asc')
         .get()
       let events = []
