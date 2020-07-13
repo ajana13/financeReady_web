@@ -35,6 +35,15 @@ const routes = [
     // which is lazy-loaded when the route is visited.
     component: () =>
       import(/* webpackChunkName: "about" */ '../views/About.vue'),
+    props: {
+      // <-- props as an Object
+      user: {
+        firstName: "Anu",
+        lastName: "Jana",
+        // name: name,
+        // event: events
+      },
+    },
   },
 ]
 
