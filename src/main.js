@@ -26,6 +26,45 @@ firebase.initializeApp({
 
 export const db = firebase.firestore()
 
+// let events = []
+
+async function getEvents() {
+  let snapshot = await db
+    .collection('temp')
+    // .orderBy('date', 'asc')
+    .get()
+  let events = []
+  //   console.log(snapshot.doc)
+  //   for (let i = 0; i < snapshot.length; i++) {
+  //     let appData = snapshot[i].data()
+  //     appData.id = snapshot[i].id
+  //     appData.date = Date.parse(appData.start)
+  //     this.updateDate(appData)
+  //     events.push(appData)
+  //   }
+  // }
+  snapshot.forEach(doc => {
+    let appData = doc.data()
+    appData.id = doc.id
+    // appData.date = Date.parse(appData.start)
+    // this.updateDate(appData)
+    events.push(appData)
+    // console.log(events)
+  })
+  return events
+}
+//   // await this.updateAllBal()
+//   // this.events = events
+// }
+
+let events = getEvents()
+
+// console.log(events)
+
+export default {
+  data: events,
+}
+
 new Vue({
   router,
   store,
