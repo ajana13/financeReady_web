@@ -4,6 +4,11 @@ import Home from '../views/Home.vue'
 
 Vue.use(VueRouter)
 
+let firstName = "Anu"
+let lastName = "Jana"
+
+let name = { firstName, lastName }
+
 const routes = [
   {
     path: '/',
@@ -38,9 +43,9 @@ const routes = [
     props: {
       // <-- props as an Object
       user: {
-        firstName: "Anu",
-        lastName: "Jana",
-        // name: name,
+        // firstName: "Anu",
+        // lastName: "Jana",
+        name: name,
         // event: events
       },
     },
