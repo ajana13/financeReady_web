@@ -25,6 +25,28 @@ firebase.initializeApp({
 })
 
 export const db = firebase.firestore()
+// let events = []
+// async function getData() {
+//   let snapshot = await db
+//     .collection('temp')
+//     // .orderBy('date', 'asc')
+//     .get()
+//   events = []
+//   snapshot.forEach(doc => {
+//     let appData = doc.data()
+//     appData.id = doc.id
+//     // appData.date = Date.parse(appData.start)
+//     // this.updateDate(appData)
+//     events.push(appData)
+//     // console.log(events)
+//   })
+//   return events
+// }
+// export async function data() {
+//   events = await getData()
+//   return events
+// }
+// data().then(events => console.log(events))
 
 new Vue({
   router,

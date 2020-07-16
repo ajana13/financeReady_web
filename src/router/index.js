@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
+// import { data } from '@/main.js'
 
 Vue.use(VueRouter)
 
@@ -11,7 +12,7 @@ Vue.use(VueRouter)
 
 const routes = [
   {
-    path: '/',
+    path: '/home',
     name: 'Home',
     component: Home,
   },
@@ -43,10 +44,10 @@ const routes = [
     props: {
       // <-- props as an Object
       user: {
-        firstName: "Anu",
-        lastName: "Jana",
+        firstName: 'Anu',
+        lastName: 'Jana',
         // name: name,
-        // event: events
+        // event: events,
       },
     },
   },
